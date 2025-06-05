@@ -1,0 +1,28 @@
+# IntelliJ
+.idea/
+*.iml
+
+# Build
+/out/
+target/
+
+# Logs
+*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos temporários
+*.class
+*.swp
+
+# JavaFX
+*.jar
+
+# Maven
+.mvn/
+.settings/
+
+./usuarios.txt
+./boards.txt

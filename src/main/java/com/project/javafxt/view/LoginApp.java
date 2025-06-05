@@ -26,7 +26,7 @@ public class LoginApp extends Application {
         // Campos de entrada para nome, email e senha
         TextField nomeField = new TextField();
         TextField emailField = new TextField();
-        PasswordField senhaField = new PasswordField();
+        PasswordField senhaField = new PasswordField(); 
 
         // Botões para cadastrar e fazer login
         Button btnCadastrar = new Button("Cadastrar");
