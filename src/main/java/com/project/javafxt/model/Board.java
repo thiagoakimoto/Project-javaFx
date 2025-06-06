@@ -13,6 +13,9 @@ public class Board implements Serializable {
     // Atributos (campos) que guardam o que o quadro tem: título e descrição
     private String titulo;
     private String descricao;
+    
+    // NOVO: ID do projeto ao qual este board pertence (null se não estiver associado a nenhum projeto)
+    private String projetoId;
 
     /**
      * Construtor: cria um novo Board e já define “título” e “descrição” de uma vez.
@@ -22,6 +25,19 @@ public class Board implements Serializable {
     public Board(String titulo, String descricao) {
         this.titulo = titulo;       // Guarda o valor passado em “titulo”
         this.descricao = descricao; // Guarda o valor passado em “descricao”
+        this.projetoId = null;      // Inicialmente, o board não está associado a nenhum projeto
+    }
+    
+    /**
+     * Construtor alternativo que já associa o board a um projeto
+     * @param titulo texto que vai aparecer como nome do quadro
+     * @param descricao texto que explica o conteúdo do quadro
+     * @param projetoId ID do projeto ao qual este board pertence
+     */
+    public Board(String titulo, String descricao, String projetoId) {
+        this.titulo = titulo;
+        this.descricao = descricao;
+        this.projetoId = projetoId;
     }
 
     // GETTERS: métodos para ler (pegar) o que está dentro de titulo e descricao
@@ -38,6 +54,13 @@ public class Board implements Serializable {
      */
     public String getDescricao() {
         return descricao;
+    }
+    
+    /**
+     * @return o ID do projeto associado a este board ou null se não estiver associado
+     */
+    public String getProjetoId() {
+        return projetoId;
     }
 
     // SETTERS: métodos para alterar (mudar) o que está dentro de titulo e descricao
@@ -56,5 +79,13 @@ public class Board implements Serializable {
      */
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+    
+    /**
+     * Associa este board a um projeto pelo ID do projeto.
+     * @param projetoId ID do projeto ao qual este board deve ser associado (null para desassociar)
+     */
+    public void setProjetoId(String projetoId) {
+        this.projetoId = projetoId;
     }
 }
