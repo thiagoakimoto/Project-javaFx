@@ -324,7 +324,7 @@ public class BoardApp extends Application {
                 new Label("Projeto:"),
                 projetoComboBox,
                 new HBox(10, btnCriar, btnEditar, btnExcluir),
-                new HBox(10, btnVoltar, btnGerenciarProjetos)
+                new HBox(10, btnVoltar, btnGerenciarProjetos, btnVerTasks)
         );
 
         // Configura a cena e o stage
