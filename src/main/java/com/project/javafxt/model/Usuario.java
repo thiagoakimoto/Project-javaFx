@@ -1,61 +1,37 @@
 package com.project.javafxt.model;
 
-/* Classe que representa um usuário com nome, email e senha
-Ou seja, é a ficha de cadastramento
+// Aqui estamos dizendo que essa classe pode ser salva e lida de um arquivo.
+import java.io.Serializable;
 
-UsuarioFileHandler, carrega os usuarios, usando o método carregar,  e esse méteodo usa o método
-toString,   para criar um objetos Usuario, a partir das strings lidas.
+public class Usuario implements Serializable {
+    // Isso é como um número de identificação para saber se a versão do arquivo é a mesma.
+    private static final long serialVersionUID = 1L;
 
-Ou seja a classe Usuario serve para ser instanciada. Objeto são criados a partir dele.
+    // Aqui estamos criando três atributos que cada usuário vai ter: nome, email e senha.
+    private String nome;
+    private String email;
+    private String senha;
 
-*/
-public class Usuario {
-    private String nome, email, senha; // Atributos do usuário
-
-    // Construtor que inicializa os atributos do usuário
+    // Este é o "construtor", que é como uma receita para fazer um novo usuário.
     public Usuario(String nome, String email, String senha) {
-        this.nome = nome; // Inicializa o nome
-        this.email = email; // Inicializa o email
-        this.senha = senha; // Inicializa a senha
+        this.nome = nome; // Guardamos o nome do usuário.
+        this.email = email; // Guardamos o email do usuário.
+        this.senha = senha; // Guardamos a senha do usuário.
     }
 
-    // Método para obter o nome do usuário
-    public String getNome() {
-        return nome;
-    }
+    // Aqui estão as "ferramentas" para pegar as informações do usuário.
+    public String getNome()  { return nome; }
+    public String getEmail() { return email; }
+    public String getSenha() { return senha; }
 
-    // Método para obter o email do usuário
-    public String getEmail() {
-        return email;
-    }
+    // E aqui estão as "ferramentas" para mudar as informações do usuário.
+    public void setNome(String nome)   { this.nome = nome; }
+    public void setEmail(String email) { this.email = email; }
+    public void setSenha(String senha) { this.senha = senha; }
 
-    // Método para obter a senha do usuário
-    public String getSenha() {
-        return senha;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
-
-
-
-    // Método que retorna uma representação em String do usuário
+    // Este método ajuda a mostrar as informações do usuário de um jeito fácil.
     @Override
     public String toString() {
-        return nome + ";" + email + ";" + senha; // Formato: nome;email;senha
+        return "Usuario{nome='" + nome + "', email='" + email + "', senha='" + senha + "'}";
     }
-
-    // Método estático que cria um usuário a partir de uma String
-    public static Usuario fromString(String linha) {
-        String[] partes = linha.split(";"); // Divide a linha em partes
-        return new Usuario(partes[0], partes[1], partes[2]); // Cria um novo usuário
-    }
-
 }

@@ -1,48 +1,75 @@
-package com.project.javafxt.persistence; // Pacote onde a classe está localizada
+package com.project.javafxt.persistence; // Diz onde a classe mora
 
-import com.project.javafxt.model.Board; // Importa a classe Board, que representa um quadro
+import com.project.javafxt.model.Board;   // Importa o modelo Board
+import java.io.*;                         // Importa tudo para ler e escrever em arquivos
+import java.util.ArrayList;               // Importa a lista
+import java.util.List;                    // Importa o tipo List
 
-import java.io.*; // Importa classes para manipulação de entrada e saída
-import java.util.*; // Importa classes para trabalhar com coleções, como listas
-
-// Classe responsável por manipular a persistência dos quadros (boards) em um arquivo
+/**
+ * BoardFileHandler cuida de guardar e buscar “Boards” (quadros)
+ * num arquivo binário chamado "boards.dat".
+ * Cada vez que você criar, editar ou excluir boards, ele lê/escreve esse arquivo.
+ */
 public class BoardFileHandler {
-    // Nome do arquivo onde os quadros serão salvos
-    private static final String ARQUIVO = "boards.txt";
+    // “ARQUIVO” é o nome do arquivo onde vamos salvar/ler os Boards em binário
+    private static final String ARQUIVO = "boards.dat";
 
-    // Método para salvar um único quadro no arquivo
-    public static void salvar(Board b) {
-        try (PrintWriter pw = new PrintWriter(new FileWriter(ARQUIVO, true))) { // Abre o arquivo em modo de adição
-            pw.println(b.toString()); // Escreve a representação em string do quadro no arquivo
-        } catch (IOException e) { // Captura exceções de entrada/saída
-            e.printStackTrace(); // Imprime a pilha de erros no console
-        }
+    /**
+     * Salva (adiciona) um único Board ao final do arquivo.
+     * Em binário, não dá pra “apendar” direto sem regravar tudo,
+     * então a gente sempre carrega lista toda, adiciona o novo no final e salva de novo.
+     *
+     * @param board o objeto Board que queremos adicionar
+     */
+    public static void salvar(Board board) {
+        // 1) Carrega a lista atual de Boards que já existia
+        List<Board> lista = carregar();
+
+        // 2) Adiciona esse novo Board à lista
+        lista.add(board);
+
+        // 3) Salva toda a lista novamente no arquivo, sobrescrevendo “boards.dat”
+        salvarTodos(lista);
     }
 
-    // Método para carregar todos os quadros do arquivo
+    /**
+     * Carrega (lê) a lista completa de Boards que estão guardados no arquivo.
+     * Se o arquivo não existir, devolve uma lista vazia (nenhum quadro).
+     *
+     * @return lista de todos os Boards já salvos (ou vazia se o arquivo não existir)
+     */
     public static List<Board> carregar() {
-        List<Board> lista = new ArrayList<>(); // Cria uma lista para armazenar os quadros
-        try (BufferedReader br = new BufferedReader(new FileReader(ARQUIVO))) { // Abre o arquivo para leitura
-            String linha; // Variável para armazenar cada linha lida
-            // Lê o arquivo linha por linha
-            while ((linha = br.readLine()) != null) {
-                Board b = Board.fromString(linha); // Converte a linha em um objeto Board
-                if (b != null) lista.add(b); // Adiciona o quadro à lista se não for nulo
-            }
-        } catch (IOException e) { // Captura exceções de entrada/saída
-            // ignora se não existir
+        List<Board> lista = new ArrayList<>(); // Começa com lista vazia
+
+        // Tenta abrir “boards.dat” para ler objetos
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(ARQUIVO))) {
+            // Lê o objeto que está dentro, que deve ser uma List<Board>
+            Object obj = ois.readObject();
+
+            // Faz cast (transforma) aquele objeto genérico em List<Board>
+            lista = (List<Board>) obj;
+        } catch (IOException | ClassNotFoundException e) {
+            // Se der erro (arquivo não existe ou classe diferente), não faz nada:
+            // retorna a lista vazia (significa que ainda não havia Boards gravados).
         }
-        return lista; // Retorna a lista de quadros carregados
+
+        return lista; // Devolve a lista (vazia ou com itens lidos)
     }
 
-    // Método para salvar todos os quadros da lista no arquivo
+    /**
+     * Salva toda a lista de Boards no arquivo, gravando em binário.
+     * Usa ObjectOutputStream para gravar o List<Board> inteiro de uma vez.
+     *
+     * @param lista a lista completa de Boards que queremos manter no arquivo
+     */
     public static void salvarTodos(List<Board> lista) {
-        try (PrintWriter pw = new PrintWriter(new FileWriter(ARQUIVO))) { // Abre o arquivo para escrita (substitui o conteúdo)
-            for (Board b : lista) {
-                pw.println(b.toString()); // Escreve cada quadro no arquivo
-            }
-        } catch (IOException e) { // Captura exceções de entrada/saída
-            e.printStackTrace(); // Imprime a pilha de erros no console
+        // Tenta abrir “boards.dat” para escrever (sobrescrevendo tudo)
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(ARQUIVO))) {
+            // Escreve o objeto “lista” (que é List<Board>) em forma binária
+            oos.writeObject(lista);
+        } catch (IOException e) {
+            // Se der erro ao abrir ou escrever, mostra no console para sabermos o que aconteceu
+            e.printStackTrace();
         }
     }
 }

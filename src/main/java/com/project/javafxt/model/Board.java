@@ -1,47 +1,60 @@
-package com.project.javafxt.model; // Pacote onde a classe está localizada
+package com.project.javafxt.model; // Diz onde a classe mora
 
-// Classe que representa um "Board" (quadro) com um título e uma descrição
-public class Board {
-    // Atributos que armazenam o título e a descrição do quadro
-    private String titulo; // Armazena o título do quadro
-    private String descricao; // Armazena a descrição do quadro
+import java.io.Serializable;      // Importa para poder “serialize” (gravar em binário)
 
-    // Construtor da classe, que inicializa os atributos com os valores fornecidos
+/**
+ * Classe que representa um “Board” (quadro) com um título e uma descrição.
+ * Ao marcar como Serializable, a gente diz que é possível gravar o objeto inteiro
+ * dentro de um arquivo binário (.dat) e ler de volta depois.
+ */
+public class Board implements Serializable {
+    private static final long serialVersionUID = 1L; // Identificador de versão (sempre usamos 1L para começar)
+
+    // Atributos (campos) que guardam o que o quadro tem: título e descrição
+    private String titulo;
+    private String descricao;
+
+    /**
+     * Construtor: cria um novo Board e já define “título” e “descrição” de uma vez.
+     * @param titulo texto que vai aparecer como nome do quadro
+     * @param descricao texto que explica o conteúdo do quadro
+     */
     public Board(String titulo, String descricao) {
-        this.titulo = titulo; // Define o título do quadro
-        this.descricao = descricao; // Define a descrição do quadro
+        this.titulo = titulo;       // Guarda o valor passado em “titulo”
+        this.descricao = descricao; // Guarda o valor passado em “descricao”
     }
 
-    // Método para obter o título do quadro
+    // GETTERS: métodos para ler (pegar) o que está dentro de titulo e descricao
+
+    /**
+     * @return o texto que foi guardado em “titulo”
+     */
     public String getTitulo() {
-        return titulo; // Retorna o título
+        return titulo;
     }
 
-    // Método para obter a descrição do quadro
+    /**
+     * @return o texto que foi guardado em “descricao”
+     */
     public String getDescricao() {
-        return descricao; // Retorna a descrição
+        return descricao;
     }
 
-    // Método para definir um novo título para o quadro
+    // SETTERS: métodos para alterar (mudar) o que está dentro de titulo e descricao
+
+    /**
+     * Altera o texto guardado em “titulo” para este novo valor.
+     * @param titulo novo título que você quer colocar
+     */
     public void setTitulo(String titulo) {
-        this.titulo = titulo; // Atualiza o título
+        this.titulo = titulo;
     }
 
-    // Método para definir uma nova descrição para o quadro
+    /**
+     * Altera o texto guardado em “descricao” para este novo valor.
+     * @param descricao nova descrição que você quer colocar
+     */
     public void setDescricao(String descricao) {
-        this.descricao = descricao; // Atualiza a descrição
-    }
-
-    // Método que retorna uma representação em string do quadro
-    @Override
-    public String toString() {
-        return titulo + ";" + descricao; // Retorna o título e a descrição separados por ponto e vírgula
-    }
-
-    // Método estático que cria um objeto Board a partir de uma string
-    public static Board fromString(String linha) {
-        String[] partes = linha.split(";"); // Divide a string em partes usando o ponto e vírgula como delimitador
-        if (partes.length < 2) return null; // Verifica se a string contém pelo menos duas partes
-        return new Board(partes[0], partes[1]); // Cria e retorna um novo objeto Board com o título e a descrição
+        this.descricao = descricao;
     }
 }
