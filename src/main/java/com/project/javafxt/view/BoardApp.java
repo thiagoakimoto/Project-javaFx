@@ -79,6 +79,7 @@ public class BoardApp extends Application {
         Button btnEditar = new Button("Editar"); // Botão para editar um quadro existente
         Button btnExcluir = new Button("Excluir"); // Botão para excluir um quadro
         Button btnVoltar = new Button("Voltar"); // Botão para voltar à tela anterior
+        Button btnVerTasks = new Button("Ver Tasks do Board");
         // NOVO: Botão para limpar o filtro de projeto
         Button btnLimparFiltro = new Button("Mostrar Todos");
         // NOVO: Botão para ir para a tela de projetos
@@ -242,6 +243,36 @@ public class BoardApp extends Application {
                 new ProjetoApp().start(new Stage());
             } catch (Exception ex) {
                 ex.printStackTrace();
+            }
+        });
+
+        // Configuração do botão Ver Tasks
+        btnVerTasks.setOnAction(e -> {
+            // Obtém o índice do board selecionado
+            int index = boardListView.getSelectionModel().getSelectedIndex();
+
+            // Verifica se um board está selecionado
+            if (index < 0) {
+                showAlert("Aviso", "Selecione um board para ver seus Tasks.");
+                return;
+            }
+
+            // Obtém o board selecionado
+            Board boardSelecionado = boards.get(index);
+
+            // Fecha a tela atual
+            stage.close();
+
+            // Abre a tela de Tasks filtrada para este board
+            try {
+                // Criamos uma instância de TaskApp e passamos o ID do board como parâmetro
+                TaskApp TaskApp = new TaskApp();
+                // Definimos qual board está selecionado antes de abrir a tela
+                TaskApp.setboardSelecionado(boardSelecionado.getId());
+                TaskApp.start(new Stage());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                showAlert("Erro", "Não foi possível abrir a tela de Tasks.");
             }
         });
 
@@ -427,4 +458,5 @@ public class BoardApp extends Application {
         alert.setContentText(mensagem);
         alert.showAndWait();
     }
+
 }

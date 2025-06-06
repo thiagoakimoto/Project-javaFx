@@ -56,6 +56,8 @@ public class BoardFileHandler {
         return lista; // Devolve a lista (vazia ou com itens lidos)
     }
 
+
+
     /**
      * Salva toda a lista de Boards no arquivo, gravando em binário.
      * Usa ObjectOutputStream para gravar o List<Board> inteiro de uma vez.
@@ -71,5 +73,26 @@ public class BoardFileHandler {
             // Se der erro ao abrir ou escrever, mostra no console para sabermos o que aconteceu
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Busca um board pelo seu ID.
+     *
+     * @param id O ID do board a ser encontrado
+     * @return O board encontrado ou null se não encontrar
+     */
+    public static Board buscarPorId(String id) {
+        // Carrega todos os board
+        List<Board> boards = carregar();
+
+        // Procura o board com o ID especificado
+        for (Board board : boards) {
+            if (board.getId().equals(id)) {
+                return board;
+            }
+        }
+
+        // Retorna null se não encontrar o board
+        return null;
     }
 }

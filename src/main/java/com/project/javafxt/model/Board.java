@@ -1,6 +1,7 @@
 package com.project.javafxt.model; // Diz onde a classe mora
 
 import java.io.Serializable;      // Importa para poder “serialize” (gravar em binário)
+import java.util.UUID;
 
 /**
  * Classe que representa um “Board” (quadro) com um título e uma descrição.
@@ -13,6 +14,7 @@ public class Board implements Serializable {
     // Atributos (campos) que guardam o que o quadro tem: título e descrição
     private String titulo;
     private String descricao;
+    private String id; // Identificador único do board
     
     // NOVO: ID do projeto ao qual este board pertence (null se não estiver associado a nenhum projeto)
     private String projetoId;
@@ -23,6 +25,7 @@ public class Board implements Serializable {
      * @param descricao texto que explica o conteúdo do quadro
      */
     public Board(String titulo, String descricao) {
+        this.id = UUID.randomUUID().toString();
         this.titulo = titulo;       // Guarda o valor passado em “titulo”
         this.descricao = descricao; // Guarda o valor passado em “descricao”
         this.projetoId = null;      // Inicialmente, o board não está associado a nenhum projeto
@@ -41,6 +44,14 @@ public class Board implements Serializable {
     }
 
     // GETTERS: métodos para ler (pegar) o que está dentro de titulo e descricao
+
+    /**
+     * Obtém o ID único do projeto.
+     * @return O ID do projeto
+     */
+    public String getId() {
+        return id;
+    }
 
     /**
      * @return o texto que foi guardado em “titulo”
