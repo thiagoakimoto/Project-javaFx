@@ -4,8 +4,10 @@ import com.project.javafxt.model.Projeto;
 import com.project.javafxt.model.Board;
 import com.project.javafxt.persistence.ProjetoFileHandler;
 import com.project.javafxt.persistence.BoardFileHandler;
+import com.project.javafxt.util.WindowManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -28,20 +30,179 @@ public class ProjetoApp extends Application {
     
     @Override
     public void start(Stage stage) {
+        // Define modern styling with CSS
+        String css = 
+            "* {\n" +
+            "    -fx-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n" +
+            "}\n" +
+            ".root {\n" +
+            "    -fx-background-color: #f5f5f7;\n" +
+            "}\n" +
+            ".header-title {\n" +
+            "    -fx-font-size: 24px;\n" +
+            "    -fx-font-weight: bold;\n" +
+            "    -fx-text-fill: #333;\n" +
+            "    -fx-alignment: center;\n" +
+            "}\n" +
+            ".section-title {\n" +
+            "    -fx-font-size: 16px;\n" +
+            "    -fx-font-weight: bold;\n" +
+            "    -fx-text-fill: #444;\n" +
+            "}\n" +
+            ".card {\n" +
+            "    -fx-background-color: white;\n" +
+            "    -fx-background-radius: 8;\n" +
+            "    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);\n" +
+            "    -fx-padding: 20;\n" +
+            "}\n" +
+            ".button {\n" +
+            "    -fx-background-color: #0078d7;\n" +
+            "    -fx-text-fill: white;\n" +
+            "    -fx-font-weight: bold;\n" +
+            "    -fx-background-radius: 4;\n" +
+            "    -fx-padding: 8 16;\n" +
+            "    -fx-cursor: hand;\n" +
+            "}\n" +
+            ".button:hover {\n" +
+            "    -fx-background-color: #0066b3;\n" +
+            "}\n" +
+            ".button.delete {\n" +
+            "    -fx-background-color: #d32f2f;\n" +
+            "}\n" +
+            ".button.delete:hover {\n" +
+            "    -fx-background-color: #b71c1c;\n" +
+            "}\n" +
+            ".button.secondary {\n" +
+            "    -fx-background-color: #6c757d;\n" +
+            "}\n" +
+            ".button.secondary:hover {\n" +
+            "    -fx-background-color: #5a6268;\n" +
+            "}\n" +
+            ".button.success {\n" +
+            "    -fx-background-color: #28a745;\n" +
+            "}\n" +
+            ".button.success:hover {\n" +
+            "    -fx-background-color: #218838;\n" +
+            "}\n" +
+            ".list-view {\n" +
+            "    -fx-background-color: white;\n" +
+            "    -fx-background-radius: 4;\n" +
+            "    -fx-border-color: #e0e0e0;\n" +
+            "    -fx-border-radius: 4;\n" +
+            "}\n" +
+            ".list-cell {\n" +
+            "    -fx-padding: 10 15;\n" +
+            "    -fx-background-color: white;\n" +
+            "}\n" +
+            ".list-cell:filled:selected {\n" +
+            "    -fx-background-color: #e6f2ff;\n" +
+            "    -fx-text-fill: black;\n" +
+            "}\n" +
+            ".text-field, .text-area {\n" +
+            "    -fx-background-color: white;\n" +
+            "    -fx-border-color: #e0e0e0;\n" +
+            "    -fx-border-radius: 4;\n" +
+            "    -fx-background-radius: 4;\n" +
+            "    -fx-padding: 8;\n" +
+            "}\n";
+            
         // Atualiza a lista de projetos na interface
         atualizarLista();
         
-        // Campos para edição de projetos
-        TextField nomeField = new TextField();
-        TextField descricaoField = new TextField();
+        // Main container with BorderPane for better centering
+        BorderPane borderPane = new BorderPane();
         
-        // Botões para as operações CRUD (Criar, Ler, Atualizar, Deletar)
+        // Main content container
+        VBox mainContainer = new VBox(20);
+        mainContainer.setPadding(new Insets(20));
+        mainContainer.setAlignment(Pos.TOP_CENTER);
+        mainContainer.setMaxWidth(700);
+        
+        // Header card
+        VBox headerCard = new VBox(10);
+        headerCard.getStyleClass().add("card");
+        headerCard.setMaxWidth(600);
+        headerCard.setAlignment(Pos.CENTER);
+        
+        Label titleLabel = new Label("Gerenciamento de Projetos");
+        titleLabel.getStyleClass().add("header-title");
+        titleLabel.setMaxWidth(Double.MAX_VALUE);
+        
+        headerCard.getChildren().add(titleLabel);
+        
+        // Project list card
+        VBox listCard = new VBox(10);
+        listCard.getStyleClass().add("card");
+        listCard.setMaxWidth(600);
+        listCard.setAlignment(Pos.CENTER);
+        
+        Label listTitle = new Label("Projetos");
+        listTitle.getStyleClass().add("section-title");
+        
+        projetoListView.setPrefHeight(250);
+        projetoListView.setMaxWidth(560);
+        
+        listCard.getChildren().addAll(listTitle, projetoListView);
+        
+        // Project details card
+        VBox detailsCard = new VBox(15);
+        detailsCard.getStyleClass().add("card");
+        detailsCard.setMaxWidth(600);
+        detailsCard.setAlignment(Pos.CENTER);
+        
+        Label detailsTitle = new Label("Detalhes do Projeto");
+        detailsTitle.getStyleClass().add("section-title");
+        
+        VBox formFields = new VBox(10);
+        formFields.setMaxWidth(560);
+        
+        TextField nomeField = new TextField();
+        nomeField.setPromptText("Nome do projeto");
+        nomeField.setMaxWidth(Double.MAX_VALUE);
+        
+        TextField descricaoField = new TextField();
+        descricaoField.setPromptText("Descrição do projeto");
+        descricaoField.setMaxWidth(Double.MAX_VALUE);
+        
+        formFields.getChildren().addAll(
+            new Label("Nome do Projeto:"),
+            nomeField,
+            new Label("Descrição do Projeto:"),
+            descricaoField
+        );
+        
+        // Project action buttons
+        HBox actionButtons = new HBox(15);
+        actionButtons.setAlignment(Pos.CENTER);
+        
         Button btnCriar = new Button("Criar Projeto");
         Button btnEditar = new Button("Editar Projeto");
         Button btnExcluir = new Button("Excluir Projeto");
-        Button btnVerBoards = new Button("Ver Boards do Projeto");
-        Button btnVoltar = new Button("Voltar");
+        btnExcluir.getStyleClass().add("delete");
         
+        actionButtons.getChildren().addAll(btnCriar, btnEditar, btnExcluir);
+        
+        detailsCard.getChildren().addAll(detailsTitle, formFields, actionButtons);
+        
+        // Navigation buttons
+        HBox navButtons = new HBox(15);
+        navButtons.setAlignment(Pos.CENTER);
+        
+        Button btnVerBoards = new Button("Ver Boards do Projeto");
+        btnVerBoards.getStyleClass().add("success");
+        
+        Button btnVoltar = new Button("Voltar");
+        btnVoltar.getStyleClass().add("secondary");
+        
+        navButtons.getChildren().addAll(btnVerBoards, btnVoltar);
+        
+        // Add all cards to main container
+        mainContainer.getChildren().addAll(headerCard, listCard, detailsCard, navButtons);
+        
+        // Set main container in the center of BorderPane
+        borderPane.setCenter(mainContainer);
+        
+        // Keep existing functionality for button actions
         // Configuração do botão Criar
         btnCriar.setOnAction(e -> {
             // Verifica se os campos estão preenchidos
@@ -170,6 +331,8 @@ public class ProjetoApp extends Application {
             // Obtém o projeto selecionado
             Projeto projetoSelecionado = projetos.get(index);
             
+            // Salvar o estado da janela atual
+            WindowManager.saveWindowState(stage);
             // Fecha a tela atual
             stage.close();
             
@@ -179,7 +342,10 @@ public class ProjetoApp extends Application {
                 BoardApp boardApp = new BoardApp();
                 // Definimos qual projeto está selecionado antes de abrir a tela
                 boardApp.setProjetoSelecionado(projetoSelecionado.getId());
-                boardApp.start(new Stage());
+                
+                Stage newStage = new Stage();
+                boardApp.start(newStage);
+                WindowManager.applyWindowState(newStage);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 showAlert("Erro", "Não foi possível abrir a tela de boards.");
@@ -188,12 +354,16 @@ public class ProjetoApp extends Application {
         
         // Configuração do botão Voltar
         btnVoltar.setOnAction(e -> {
+            // Salvar o estado da janela atual
+            WindowManager.saveWindowState(stage);
             // Fecha a tela atual
             stage.close();
             
             // Volta para a tela Home
             try {
-                new HomeApp().start(new Stage());
+                Stage newStage = new Stage();
+                new HomeApp().start(newStage);
+                WindowManager.applyWindowState(newStage);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -210,24 +380,10 @@ public class ProjetoApp extends Application {
             }
         });
         
-        // Criação do layout da interface
-        VBox layout = new VBox(10);
-        layout.setPadding(new Insets(15));
+        // Set up the scene with modern styling
+        Scene scene = new Scene(borderPane, 700, 700);
+        scene.getStylesheets().add("data:text/css," + css.replace("\n", ""));
         
-        // Adiciona os componentes ao layout
-        layout.getChildren().addAll(
-            new Label("Projetos:"),
-            projetoListView,
-            new Label("Nome do Projeto:"),
-            nomeField,
-            new Label("Descrição do Projeto:"),
-            descricaoField,
-            new HBox(10, btnCriar, btnEditar, btnExcluir),
-            new HBox(10, btnVerBoards, btnVoltar)
-        );
-        
-        // Configura a cena e o stage
-        Scene scene = new Scene(layout, 500, 500);
         stage.setScene(scene);
         stage.setTitle("Gerenciamento de Projetos");
         stage.show();
