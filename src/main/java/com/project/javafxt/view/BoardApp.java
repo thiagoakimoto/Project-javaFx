@@ -4,8 +4,10 @@ import com.project.javafxt.model.Board; // Importa a classe Board, que represent
 import com.project.javafxt.model.Projeto; // NOVO: Importa a classe Projeto, que representa um projeto
 import com.project.javafxt.persistence.BoardFileHandler; // Importa a classe que lida com a persistência dos quadros
 import com.project.javafxt.persistence.ProjetoFileHandler; // NOVO: Importa a classe que lida com a persistência dos projetos
+import com.project.javafxt.util.WindowManager;
 import javafx.application.Application; // Importa a classe base para aplicações JavaFX
 import javafx.geometry.Insets; // Importa para definir espaçamentos
+import javafx.geometry.Pos;
 import javafx.scene.Scene; // Importa a classe que representa uma cena na interface gráfica
 import javafx.scene.control.*; // Importa classes de controles como botões e campos de texto
 import javafx.scene.layout.*; // Importa classes para layouts
@@ -38,28 +40,165 @@ public class BoardApp extends Application {
     // Método que inicia a aplicação
     @Override
     public void start(Stage stage) {
-        // Atualiza a lista de boards na interface
+        // Modern CSS styling (igual padrão das outras telas)
+        String css =
+            "* {\n" +
+            "    -fx-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n" +
+            "}\n" +
+            ".root {\n" +
+            "    -fx-background-color: #f5f5f7;\n" +
+            "}\n" +
+            ".header-title {\n" +
+            "    -fx-font-size: 24px;\n" +
+            "    -fx-font-weight: bold;\n" +
+            "    -fx-text-fill: #333;\n" +
+            "    -fx-alignment: center;\n" +
+            "}\n" +
+            ".section-title {\n" +
+            "    -fx-font-size: 16px;\n" +
+            "    -fx-font-weight: bold;\n" +
+            "    -fx-text-fill: #444;\n" +
+            "}\n" +
+            ".filter-badge {\n" +
+            "    -fx-background-color: #e3f2fd;\n" +
+            "    -fx-background-radius: 4;\n" +
+            "    -fx-padding: 5 10;\n" +
+            "    -fx-text-fill: #0d47a1;\n" +
+            "}\n" +
+            ".button {\n" +
+            "    -fx-background-color: #0078d7;\n" +
+            "    -fx-text-fill: white;\n" +
+            "    -fx-font-weight: bold;\n" +
+            "    -fx-background-radius: 4;\n" +
+            "    -fx-padding: 8 16;\n" +
+            "    -fx-cursor: hand;\n" +
+            "}\n" +
+            ".button:hover {\n" +
+            "    -fx-background-color: #0066b3;\n" +
+            "}\n" +
+            ".button.delete {\n" +
+            "    -fx-background-color: #d32f2f;\n" +
+            "}\n" +
+            ".button.delete:hover {\n" +
+            "    -fx-background-color: #b71c1c;\n" +
+            "}\n" +
+            ".button.secondary {\n" +
+            "    -fx-background-color: #6c757d;\n" +
+            "}\n" +
+            ".button.secondary:hover {\n" +
+            "    -fx-background-color: #5a6268;\n" +
+            "}\n" +
+            ".button.feature {\n" +
+            "    -fx-background-color: #28a745;\n" +
+            "    -fx-font-size: 14px;\n" +
+            "    -fx-padding: 12 20;\n" +
+            "}\n" +
+            ".button.feature:hover {\n" +
+            "    -fx-background-color: #218838;\n" +
+            "}\n" +
+            ".card {\n" +
+            "    -fx-background-color: white;\n" +
+            "    -fx-background-radius: 8;\n" +
+            "    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);\n" +
+            "    -fx-padding: 20;\n" +
+            "}\n" +
+            ".list-view {\n" +
+            "    -fx-background-color: white;\n" +
+            "    -fx-background-radius: 4;\n" +
+            "    -fx-border-color: #e0e0e0;\n" +
+            "    -fx-border-radius: 4;\n" +
+            "}\n" +
+            ".list-cell {\n" +
+            "    -fx-padding: 10 15;\n" +
+            "    -fx-background-color: white;\n" +
+            "}\n" +
+            ".list-cell:filled:selected {\n" +
+            "    -fx-background-color: #e6f2ff;\n" +
+            "    -fx-text-fill: black;\n" +
+            "}\n" +
+            ".text-field, .text-area {\n" +
+            "    -fx-background-color: white;\n" +
+            "    -fx-border-color: #e0e0e0;\n" +
+            "    -fx-border-radius: 4;\n" +
+            "    -fx-background-radius: 4;\n" +
+            "    -fx-padding: 8;\n" +
+            "}\n";
+
         atualizarLista();
 
-        // Campos para edição de boards
-        TextField tituloField = new TextField(); // Campo para o título do quadro
-        TextField descField = new TextField(); // Campo para a descrição do quadro
-        
-        // NOVO: ComboBox para selecionar projetos
+        // Main container centralizado
+        BorderPane borderPane = new BorderPane();
+
+        VBox mainContainer = new VBox(20);
+        mainContainer.setPadding(new Insets(20));
+        mainContainer.setAlignment(Pos.TOP_CENTER);
+        mainContainer.setMaxWidth(700);
+
+        // Header card
+        VBox headerCard = new VBox(10);
+        headerCard.getStyleClass().add("card");
+        headerCard.setMaxWidth(600);
+        headerCard.setAlignment(Pos.CENTER);
+
+        Label titleLabel = new Label("Gerenciar Boards");
+        titleLabel.getStyleClass().add("header-title");
+        titleLabel.setMaxWidth(Double.MAX_VALUE);
+
+        // Filtro de projeto
+        Label labelProjeto = new Label();
+        atualizarLabelProjeto(labelProjeto);
+        labelProjeto.getStyleClass().add("filter-badge");
+
+        Button btnLimparFiltro = new Button("Mostrar Todos");
+        btnLimparFiltro.getStyleClass().add("secondary");
+
+        HBox filterControls = new HBox(15, labelProjeto, btnLimparFiltro);
+        filterControls.setAlignment(Pos.CENTER);
+
+        headerCard.getChildren().addAll(titleLabel, filterControls);
+
+        // Lista de boards card
+        VBox listCard = new VBox(10);
+        listCard.getStyleClass().add("card");
+        listCard.setMaxWidth(600);
+        listCard.setAlignment(Pos.CENTER);
+
+        Label listTitle = new Label("Lista de Boards");
+        listTitle.getStyleClass().add("section-title");
+
+        boardListView.setPrefHeight(250);
+        boardListView.setMaxWidth(560);
+
+        listCard.getChildren().addAll(listTitle, boardListView);
+
+        // Detalhes do board card
+        VBox detailsCard = new VBox(10);
+        detailsCard.getStyleClass().add("card");
+        detailsCard.setMaxWidth(600);
+        detailsCard.setAlignment(Pos.CENTER);
+
+        Label detailsTitle = new Label("Detalhes do Board");
+        detailsTitle.getStyleClass().add("section-title");
+
+        VBox formFields = new VBox(10);
+        formFields.setMaxWidth(560);
+
+        TextField tituloField = new TextField();
+        tituloField.setPromptText("Título do Board");
+        tituloField.setMaxWidth(Double.MAX_VALUE);
+
+        TextField descField = new TextField();
+        descField.setPromptText("Descrição do Board");
+        descField.setMaxWidth(Double.MAX_VALUE);
+
+        // ComboBox de projetos
         ComboBox<String> projetoComboBox = new ComboBox<>();
-        // Adiciona a opção "Sem projeto"
         projetoComboBox.getItems().add("[Sem projeto]");
-        
-        // Carrega a lista de projetos e adiciona ao ComboBox
         List<Projeto> projetos = ProjetoFileHandler.carregar();
         for (Projeto p : projetos) {
             projetoComboBox.getItems().add(p.getId() + " - " + p.getNome());
         }
-        
-        // Seleciona "Sem projeto" por padrão
         projetoComboBox.getSelectionModel().select(0);
-        
-        // Se temos um projeto selecionado, encontra-o no ComboBox
         if (projetoSelecionado != null) {
             for (int i = 0; i < projetoComboBox.getItems().size(); i++) {
                 String item = projetoComboBox.getItems().get(i);
@@ -69,21 +208,43 @@ public class BoardApp extends Application {
                 }
             }
         }
-        
-        // Label para mostrar o projeto selecionado
-        Label labelProjeto = new Label();
-        atualizarLabelProjeto(labelProjeto);
 
-        // Botões para as operações CRUD
-        Button btnCriar = new Button("Criar"); // Botão para criar um novo quadro
-        Button btnEditar = new Button("Editar"); // Botão para editar um quadro existente
-        Button btnExcluir = new Button("Excluir"); // Botão para excluir um quadro
-        Button btnVoltar = new Button("Voltar"); // Botão para voltar à tela anterior
-        Button btnVerTasks = new Button("Ver Tasks do Board");
-        // NOVO: Botão para limpar o filtro de projeto
-        Button btnLimparFiltro = new Button("Mostrar Todos");
-        // NOVO: Botão para ir para a tela de projetos
+        formFields.getChildren().addAll(
+            new Label("Título:"), tituloField,
+            new Label("Descrição:"), descField,
+            new Label("Projeto:"), projetoComboBox
+        );
+
+        // Botões de ação
+        HBox actionButtons = new HBox(15);
+        actionButtons.setAlignment(Pos.CENTER);
+
+        Button btnCriar = new Button("Criar");
+        Button btnEditar = new Button("Editar");
+        Button btnExcluir = new Button("Excluir");
+        btnExcluir.getStyleClass().add("delete");
+
+        actionButtons.getChildren().addAll(btnCriar, btnEditar, btnExcluir);
+
+        detailsCard.getChildren().addAll(detailsTitle, formFields, actionButtons);
+
+        // Botões de navegação
+        HBox navButtons = new HBox(15);
+        navButtons.setAlignment(Pos.CENTER);
+
+        Button btnVoltar = new Button("Voltar");
+        btnVoltar.getStyleClass().add("secondary");
+
         Button btnGerenciarProjetos = new Button("Gerenciar Projetos");
+        Button btnVerTasks = new Button("Ver Tasks do Board");
+        btnVerTasks.getStyleClass().add("feature");
+
+        navButtons.getChildren().addAll(btnVoltar, btnGerenciarProjetos, btnVerTasks);
+
+        // Adiciona todos os cards ao container principal
+        mainContainer.getChildren().addAll(headerCard, listCard, detailsCard, navButtons);
+
+        borderPane.setCenter(mainContainer);
 
         // Configuração do botão Criar
         btnCriar.setOnAction(e -> {
@@ -304,31 +465,10 @@ public class BoardApp extends Application {
             }
         });
 
-        // Criação do layout da interface
-        VBox layout = new VBox(10);
-        layout.setPadding(new Insets(15));
-        
-        // NOVO: HBox para mostrar o projeto selecionado e o botão para limpar o filtro
-        HBox projetoFilterBox = new HBox(10, labelProjeto, btnLimparFiltro);
-        
-        // Adiciona os componentes ao layout
-        layout.getChildren().addAll(
-                new Label("Boards:"),
-                // Se temos um projeto selecionado, mostramos a informação
-                projetoFilterBox,
-                boardListView,
-                new Label("Título:"),
-                tituloField,
-                new Label("Descrição:"),
-                descField,
-                new Label("Projeto:"),
-                projetoComboBox,
-                new HBox(10, btnCriar, btnEditar, btnExcluir),
-                new HBox(10, btnVoltar, btnGerenciarProjetos, btnVerTasks)
-        );
+        // Set up the scene with the CSS
+        Scene scene = new Scene(borderPane, 700, 700);
+        scene.getStylesheets().add("data:text/css," + css.replace("\n", ""));
 
-        // Configura a cena e o stage
-        Scene scene = new Scene(layout, 500, 600);
         stage.setScene(scene);
         stage.setTitle("Gerenciar Boards");
         stage.show();
